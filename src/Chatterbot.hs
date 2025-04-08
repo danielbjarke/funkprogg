@@ -1,6 +1,6 @@
 module Chatterbot where
 import Utilities
-import System.Random
+-- import System.Random
 import Data.Char
 import Data.Maybe
 
@@ -108,8 +108,8 @@ ruleCompile = undefined
 -- If we choose one element that represents the wildcard
 -- mkPattern '*' "Hi *!" => [Item 'H', Item 'i', Wildcard, Item '!']
 mkPattern :: Eq a => a -> [a] -> Pattern a
-{- TO BE WRITTEN -}
-mkPattern = undefined
+mkPattern wildcard xs
+  = Pattern (map (\x -> if x == wildcard then Wildcard else Item x) xs)
 
 stringToPattern :: String -> String -> Pattern String
 stringToPattern wc = mkPattern wc . words
