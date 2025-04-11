@@ -146,23 +146,43 @@ reductionsApply = undefined
 
 -- Replaces a wildcard in a template with the list given as the third argument
 substitute :: Eq a => Template a -> [a] -> [a]
-{- TO BE WRITTEN -}
-substitute = undefined
+substitute (Pattern ps) replacement =
+  concatMap replace ps
+  where
+    replace Wildcard     = replacement
+    replace (Item x)     = [x]
+
+
 
 -- Tries to match two lists. If they match, the result consists of the sublist
 -- bound to the wildcard in the pattern list.
 match :: Eq a => Pattern a -> [a] -> Maybe [a]
-{- TO BE WRITTEN -}
-match = undefined
+match (Pattern _) [] = Nothing
+match (Pattern []) _ = Nothing
+match (Pattern ps) listToMatch 
+      | notElem Wildcard ps     = Just []
+      | length (filter (== Wildcard) ps) == 1   = singleWildcardMatch (Pattern ps) listToMatch
+      | otherwise     = longerWildcardMatch (Pattern ps) listToMatch
+   
 
--- Helper function to match
+-- Helper function to match, funkar endast om listan är av typen bara char????
+
 singleWildcardMatch, longerWildcardMatch :: Eq a => Pattern a -> [a] -> Maybe [a]
-singleWildcardMatch (Pattern (Wildcard:ps)) (x:xs) =
+singleWildcardMatch (Pattern (Wildcard:ps)) (x:xs) = --ifall Wildcard kommer först
   case match (Pattern ps) xs of
     Nothing -> Nothing
     Just _ -> Just [x]
-{- TO BE WRITTEN -}
-longerWildcardMatch = undefined
+singleWildcardMatch (Pattern (Item x:ps)) (y:ys) -- annars
+    | x == y  = singleWildcardMatch (Pattern ps) ys
+    | otherwise = Nothing
+
+longerWildcardMatch (Pattern []) _ = Nothing
+longerWildcardMatch (Pattern (Wildcard:ps)) (y:ys) = Just [y]
+longerWildcardMatch (Pattern (Item x:ps)) (y:ys) 
+    | x == y    = longerWildcardMatch (Pattern ps) ys
+    | otherwise = Nothing
+
+ 
 
 
 
