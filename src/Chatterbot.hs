@@ -159,11 +159,18 @@ substitute (Pattern ps) replacement =
 match :: Eq a => Pattern a -> [a] -> Maybe [a]
 match (Pattern _) [] = Nothing
 match (Pattern []) _ = Nothing
-match (Pattern ps) listToMatch 
-      | notElem Wildcard ps     = Just []
-      | length (filter (== Wildcard) ps) == 1   = singleWildcardMatch (Pattern ps) listToMatch
-      | otherwise     = longerWildcardMatch (Pattern ps) listToMatch
-   
+match (Pattern ps) list
+  | Wildcard `notElem` ps = if ps == map Item list then Just [] else Nothing
+  | otherwise = Nothing
+
+
+-- match (Pattern _) [] = Nothing
+-- match (Pattern []) _ = Nothing
+-- match (Pattern ps) listToMatch
+--       | Wildcard `notElem` ps     = Just []
+--       | length (filter (== Wildcard) ps) == 1   = singleWildcardMatch (Pattern ps) listToMatch
+--       | otherwise     = longerWildcardMatch (Pattern ps) listToMatch
+
 
 -- Helper function to match, funkar endast om listan är av typen bara char????
 
@@ -172,17 +179,10 @@ singleWildcardMatch (Pattern (Wildcard:ps)) (x:xs) = --ifall Wildcard kommer fö
   case match (Pattern ps) xs of
     Nothing -> Nothing
     Just _ -> Just [x]
-singleWildcardMatch (Pattern (Item x:ps)) (y:ys) -- annars
-    | x == y  = singleWildcardMatch (Pattern ps) ys
-    | otherwise = Nothing
 
-longerWildcardMatch (Pattern []) _ = Nothing
-longerWildcardMatch (Pattern (Wildcard:ps)) (y:ys) = Just [y]
-longerWildcardMatch (Pattern (Item x:ps)) (y:ys) 
-    | x == y    = longerWildcardMatch (Pattern ps) ys
-    | otherwise = Nothing
 
- 
+longerWildcardMatch = undefined
+
 
 
 
