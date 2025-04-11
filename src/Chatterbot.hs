@@ -161,27 +161,22 @@ match (Pattern _) [] = Nothing
 match (Pattern []) _ = Nothing
 match (Pattern ps) list
   | Wildcard `notElem` ps = if ps == map Item list then Just [] else Nothing
+  | head ps == Wildcard = if length ps == length list then singleWildcardMatch (Pattern ps) list else longerWildcardMatch (Pattern ps) list
   | otherwise = Nothing
-
-
--- match (Pattern _) [] = Nothing
--- match (Pattern []) _ = Nothing
--- match (Pattern ps) listToMatch
---       | Wildcard `notElem` ps     = Just []
---       | length (filter (== Wildcard) ps) == 1   = singleWildcardMatch (Pattern ps) listToMatch
---       | otherwise     = longerWildcardMatch (Pattern ps) listToMatch
 
 
 -- Helper function to match, funkar endast om listan är av typen bara char????
 
 singleWildcardMatch, longerWildcardMatch :: Eq a => Pattern a -> [a] -> Maybe [a]
-singleWildcardMatch (Pattern (Wildcard:ps)) (x:xs) = --ifall Wildcard kommer först
+singleWildcardMatch (Pattern (Wildcard:ps)) (x:xs) = 
   case match (Pattern ps) xs of
     Nothing -> Nothing
     Just _ -> Just [x]
 
-
-longerWildcardMatch = undefined
+longerWildcardMatch (Pattern ps) (x:xs) =
+  case match (Pattern ps) xs of 
+    Nothing -> Nothing
+    Just a -> Just (x : a)
 
 
 
